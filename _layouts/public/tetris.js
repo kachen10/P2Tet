@@ -68,7 +68,7 @@ function Piece ( tetromino, color ) {
     this.color = color;
 
     this.x = 3;
-    this.y = -3;
+    this.y = -2;
 }
 
 // function Piece(tetromino, color) {
