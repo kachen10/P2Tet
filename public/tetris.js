@@ -1,13 +1,16 @@
 
 const canvas = document.getElementById('tetris');
+const scoreElement = document.getElementById('score');
+
 const context = canvas.getContext('2d');
+
 
 const ROWS = 20;
 const COLS = 10;
 const SQ = 20;
 const VACANT = '#dcdde1';
 
-var gameOver = false;
+
 var KO = false;
 
 
@@ -56,29 +59,29 @@ function randomPiece() {
 }
 
 var p = randomPiece();
-
-// function Piece ( tetromino, color ) {
-//     this.tetromino= tetromino;
-//     this.direction = 0;
+var saved = 0;
+function Piece ( tetromino, color ) {
+    this.tetromino= tetromino;
+    this.direction = 0;
     
-//     this.activeTetromino = this.tetromino[this.direction];
+    this.activeTetromino = this.tetromino[this.direction];
+    this.color = color;
+
+    this.x = 3;
+    this.y = -3;
+}
+
+// function Piece(tetromino, color) {
+//     this.tetromino = tetromino;
 //     this.color = color;
 
+//     this.tetrominoN = 0; // we start from the first pattern
+//     this.activeTetromino = this.tetromino[this.tetrominoN];
+
+//     // we need to control the pieces
 //     this.x = 3;
 //     this.y = 5;
 // }
-
-function Piece(tetromino, color) {
-    this.tetromino = tetromino;
-    this.color = color;
-
-    this.tetrominoN = 0; // we start from the first pattern
-    this.activeTetromino = this.tetromino[this.tetrominoN];
-
-    // we need to control the pieces
-    this.x = 3;
-    this.y = 5;
-}
 
 
 Piece.prototype.fill = function (color) {
@@ -110,7 +113,8 @@ Piece.prototype.moveDown = function() {
         this.draw();
     } else {
         this.lock();
-        randomPiece();
+        p = randomPiece();
+       
     }
 }
 
@@ -141,36 +145,15 @@ Piece.prototype.moveRight = function() {
 
 Piece.prototype.FastDown = function () {
 
-    if (!this.collision(0, 1, this.activeTetromino)) {
-        this.unDraw();
+    this.unDraw();
+    while (!this.collision(0, 1, this.activeTetromino)) {      
         this.y++;
-        this.draw();
-    } else {
-        this.lock();
-        p = randomPiece();
     }
+    this.draw();
+    this.lock();
+    p = randomPiece();
+    
 }
-
-
-
-// Piece.prototype.collision = function( x, y, piece ) {
-
-//     piece.forEach((row) => {
-//         row.forEach((col) => {
-//             if (!piece[row][col]) { continue; }
-
-//             var newX = this.x + col + x;
-//             var newY = this.y + row + y;
-
-//             if ( newX < 0 || newX >= COLS || newY >= ROWS ) { return true; }
-//             if ( newY < 0 ) { continue; }
-//             if ( Board[newY][newX] != VACANT ) { return true; }
-            
-//         });
-//     }); 
-
-//     return false; 
-// }
 
 Piece.prototype.collision = function (x, y, piece) {
     for (r = 0; r < piece.length; r++) {
@@ -203,6 +186,7 @@ Piece.prototype.collision = function (x, y, piece) {
 
 
 Piece.prototype.rotate = function() {
+    console.log("p rotated2");
     var temp = this.tetromino[(this.direction + 1) % this.tetromino.length] ;
     var offset = 0;
     if (this.collision(0, 0, temp)) {
@@ -212,8 +196,8 @@ Piece.prototype.rotate = function() {
             offset = 1;
         }
     } 
-
-    if (this.collision(offset, 0, temp)) {
+    console.log("offset", offset);
+    if (!this.collision(offset, 0, temp)) {
         this.unDraw();
         this.x += offset;
         this.direction = (this.direction + 1) % this.tetromino.length;
@@ -232,13 +216,13 @@ Piece.prototype.lock = function() {
                 continue;
             }
             // pieces to lock on top = game over
-            // if (this.y + r < 0) {
-            //     alert("Game Over");
-            //     // stop request animation frame
-            //     gameOver = true;
-            //     break;
-            // }
-            // we lock the piece
+            if (this.y + r < 0) {
+                alert("Game Over");
+                // stop request animation frame
+                gameOver = true;
+                break;
+            }
+            
             Board[this.y + r][this.x + c] = this.color;
         }
     }
@@ -268,11 +252,28 @@ Piece.prototype.lock = function() {
 
 }
 
+// Piece.prototype.pieceSaved = function() {
+
+//     if ( saved == 0 ) {
+//         p.unDraw();
+//         saved = this.activeTetromino;
+//         this.activeTetromino = randomPiece();
+//         p.draw();
+//     } else {
+//         p.unDraw();
+//         var temp = this.activeTetromino;
+//         this.activeTetromino = saved;
+//         saved = temp;
+//         p.draw();
+//     }
+    
+// }
+
 
 document.addEventListener("keydown", CONTROL);
 var KeyPressed = {
     left: 37, up: 38, right: 39, down: 40,
-    space: 32
+    space: 32, shift: 16
 };
 function CONTROL(event) {
     if (event.keyCode == KeyPressed.right) {
@@ -294,6 +295,10 @@ function CONTROL(event) {
     else if (event.keyCode == KeyPressed.space) {
         p.FastDown();
     }
+    // else if (event.keyCode == KeyPressed.shift) {
+    //     p.pieceSaved();
+    // }
+
 
 }
 
@@ -317,22 +322,22 @@ let dropStart = Date.now();
 // }
 
 // drop();
-console.log("debug5");
 let dropCounter = 0;
 let dropInterval = 1000;
 let lastTime = 0;
+let gameOver = false;
 function update( time = 0 ) {
-    console.log("debug4");
+    
     var now = Date.now();
     var delta = now - dropStart;
 
     if( delta > dropInterval ){
-        console.log("debug");
+        
         p.moveDown();
         dropStart = Date.now();
+    }if (!gameOver) {
+        requestAnimationFrame(update);
     }
-
-    requestAnimationFrame( update );
-    console.log("debug2");
+    
 }
 update();
