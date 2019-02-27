@@ -9,7 +9,7 @@ const VACANT = '#dcdde1';
 
 var gameOver = false;
 var KO = false;
-var dropStart = Date.now();
+
 
 
 var Board = [];
@@ -36,10 +36,9 @@ function drawBoard() {
             drawSquare( col, row, Board[row][col] );
         }
     }
-
 }
 
-drawBoard( Board );
+drawBoard();
 
 const PIECES = [
     [Z, '#fa983a' ],
@@ -48,7 +47,7 @@ const PIECES = [
     [J, '#38ada9' ],
     [S, '#b8e994' ],
     [L, '#e84393' ],
-    [O, '#a29bfe' ],
+    [O, '#a29bfe' ]
 ];
 
 function randomPiece() {
@@ -56,16 +55,17 @@ function randomPiece() {
     return new Piece(PIECES[random][0], PIECES[random][1]  );
 }
 
-var p = new Piece(PIECES[1][0], PIECES[1][1]);
+var p = randomPiece();
 
 function Piece ( tetromino, color ) {
     this.tetromino= tetromino;
     this.direction = 0;
+    
     this.activeTetromino = this.tetromino[this.direction];
     this.color = color;
 
     this.x = 3;
-    this.y = 5;
+    this.y = -2;
 }
 
 
@@ -82,8 +82,6 @@ Piece.prototype.fill = function( color ) {
 Piece.prototype.draw = function() {
     this.fill( this.color );
 }
-
-p.draw();
 
 Piece.prototype.unDraw = function() {
     this.fill( VACANT );
@@ -130,12 +128,13 @@ Piece.prototype.FastDown = function () {
 }
 
 Piece.prototype.collision = function( x, y, piece ) {
+
     piece.forEach((row) => {
         row.forEach((col) => {
             if (!piece[row][col]) { continue; }
 
-            newX = this.x + col + x;
-            newY = this.y + row + y;
+            var newX = this.x + col + x;
+            var newY = this.y + row + y;
 
             if ( newX < 0 || newX >= COLS || newY >= ROWS ) { return true; }
             if ( newY < 0 ) { continue; }
@@ -150,7 +149,7 @@ Piece.prototype.collision = function( x, y, piece ) {
 Piece.prototype.rotate = function() {
     var temp = this.tetromino[(this.direction + 1) % this.tetromino.length] ;
     var offset = 0;
-    if (this.collision(0, 0, this.activeTetromino)) {
+    if (this.collision(0, 0, temp)) {
         if (this.x > COLS/2) {
             offset = -1;
         } else {
@@ -158,7 +157,7 @@ Piece.prototype.rotate = function() {
         }
     } 
 
-    if (this.collision(offset, 0, this.activeTetromino)) {
+    if (this.collision(offset, 0, temp)) {
         this.unDraw();
         this.x += offset;
         this.direction = (this.direction + 1) % this.tetromino.length;
@@ -170,36 +169,45 @@ Piece.prototype.rotate = function() {
 
 Piece.prototype.lock = function() {
 
-    Board.forEach((row) => {
-        row.forEach((col) => {
-            if (!this.activeTetromino[row][col]) {
+    for (r = 0; r < this.activeTetromino.length; r++) {
+        for (c = 0; c < this.activeTetromino.length; c++) {
+            // we skip the vacant squares
+            if (!this.activeTetromino[r][c]) {
                 continue;
             }
-            if ( this.y + r < 0 ) {
-                KO = true; 
-                break;            
+            // pieces to lock on top = game over
+            if (this.y + r < 0) {
+                alert("Game Over");
+                // stop request animation frame
+                gameOver = true;
+                break;
             }
-            Board[this.y + row][this.x+col] = this.color;
-        });
-    });
-
-    Board.forEach( row => {
-        var fullRow = true;
-        row.forEach ( col => {
-            fullRow = fullRow && (Board[row][col] != VACANT)
-        });
-        if ( fullRow ) {
-            for ( y = row; y > 1; y-- ) {
-                for ( col = 0; col < COLS; col++ ) {
-                    Board[y][col] = Board[y-1][col];
-                }               
-            }
+            // we lock the piece
+            board[this.y + r][this.x + c] = this.color;
         }
-        row.forEach ( col => {
-            Board[0][col] = VACANT;
-        });
-    });
-
+    }
+    // remove full rows
+    for (r = 0; r < ROW; r++) {
+        let isRowFull = true;
+        for (c = 0; c < COL; c++) {
+            isRowFull = isRowFull && (board[r][c] != VACANT);
+        }
+        if (isRowFull) {
+            // if the row is full
+            // we move down all the rows above it
+            for (y = r; y > 1; y--) {
+                for (c = 0; c < COL; c++) {
+                    board[y][c] = board[y - 1][c];
+                }
+            }
+            // the top row board[0][..] has no row above it
+            for (c = 0; c < COL; c++) {
+                board[0][c] = VACANT;
+            }
+            
+        }
+    }
+    // update the board
     drawBoard();
 
 }
@@ -213,16 +221,19 @@ var KeyPressed = {
 function CONTROL(event) {
     if (event.keyCode == KeyPressed.right) {
         p.moveRight();
+        dropStart = Date.now();
     }
     else if (event.keyCode == KeyPressed.left) {
         p.moveRight();
+        dropStart = Date.now();
     }
     else if (event.keyCode == KeyPressed.down) {
         p.moveDown();
-        dropStart = Date.now();
+        
     }
     else if (event.keyCode == KeyPressed.up) {
         p.rotate();
+        dropStart = Date.now();
     }
     else if (event.keyCode == KeyPressed.space) {
         p.FastDown();
@@ -231,13 +242,15 @@ function CONTROL(event) {
 
 }
 
+var dropStart = Date.now();
+
 function drop() {
 
     var now = Date.now();
     var delta = now - dropStart;
 
     if ( delta > 1000 ) {
-        piece.moveDown;
+        p.moveDown;
         dropStart = Date.now();
     }
     if ( !gameOver ) {
