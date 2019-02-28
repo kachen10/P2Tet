@@ -1,8 +1,13 @@
 
 const canvas = document.getElementById('tetris');
+const sidebar = document.getElementById('side');
+const save = document.getElementById('saved');
 const scoreElement = document.getElementById('score');
+const timeElement = document.getElementById('time');
 
 const context = canvas.getContext('2d');
+const panel = sidebar.getContext('2d');
+const stack = save.getContext('2d');
 
 
 const ROWS = 20;
@@ -12,7 +17,8 @@ const VACANT = '#dcdde1';
 
 
 var KO = false;
-
+var score = 0;
+var time = 0;
 
 
 var Board = [];
@@ -22,6 +28,49 @@ for ( row = 0; row < ROWS; row++ ) {
         Board[row][col] = VACANT;
     }
 }
+
+var currentPiece = [];
+for (row = 0; row < 6; row++) {
+    currentPiece[row] = [];
+    for (col = 0; col < 6; col++) {
+        currentPiece[row][col] = VACANT;
+    }
+}
+
+var savedPiece = [];
+for (row = 0; row < 6; row++) {
+    savedPiece[row] = [];
+    for (col = 0; col < 6; col++) {
+        savedPiece[row][col] = VACANT;
+    }
+}
+
+function drawSaved() {
+    for (row = 0; row < 6; row++) {
+        for (col = 0; col < 6; col++) {
+            drawPiece(stack, col, row, currentPiece[row][col]);
+        }
+    }
+}
+
+
+function drawSide() {
+    for (row = 0; row < 6; row++) {
+        for (col = 0; col < 6; col++) {
+            drawPiece(panel, col, row, currentPiece[row][col]);
+        }
+    }
+}
+
+function drawPiece(canvas, x, y, color) {
+
+    canvas.fillStyle = color;
+    canvas.fillRect(x * SQ, y * SQ, SQ, SQ);
+
+    canvas.strokeStyle = 'WHITE';
+    canvas.strokeRect(x * SQ, y * SQ, SQ, SQ);
+}
+
 
 function drawSquare( x, y, color ) {
     
@@ -42,6 +91,8 @@ function drawBoard() {
 }
 
 drawBoard();
+drawSide();
+drawSaved();
 
 const PIECES = [
     [Z, '#fa983a' ],
@@ -60,6 +111,7 @@ function randomPiece() {
 
 var p = randomPiece();
 var saved = 0;
+
 function Piece ( tetromino, color ) {
     this.tetromino= tetromino;
     this.direction = 0;
@@ -70,19 +122,6 @@ function Piece ( tetromino, color ) {
     this.x = 3;
     this.y = -2;
 }
-
-// function Piece(tetromino, color) {
-//     this.tetromino = tetromino;
-//     this.color = color;
-
-//     this.tetrominoN = 0; // we start from the first pattern
-//     this.activeTetromino = this.tetromino[this.tetrominoN];
-
-//     // we need to control the pieces
-//     this.x = 3;
-//     this.y = 5;
-// }
-
 
 Piece.prototype.fill = function (color) {
     for (r = 0; r < this.activeTetromino.length; r++) {
@@ -95,18 +134,37 @@ Piece.prototype.fill = function (color) {
     }
 }
 
+Piece.prototype.sideFill = function ( canvas, color) {
+    for (r = 0; r < this.activeTetromino.length; r++) {
+        for (c = 0; c < this.activeTetromino.length; c++) {
+            // we draw only occupied squares
+            if (this.activeTetromino[r][c]) {
+                drawPiece(canvas, c, r, color);
+            }
+        }
+    }
+}
+
 Piece.prototype.draw = function() {
     this.fill( this.color );
 }
-
-p.draw();
 
 
 Piece.prototype.unDraw = function() {
     this.fill( VACANT );
 }
 
+Piece.prototype.drawSide = function( canvas ) {
+    this.sideFill( canvas, this.color );
+}
+
+
+Piece.prototype.unDrawSide = function( canvas ) {
+    this.sideFill( canvas, VACANT );
+}
+
 Piece.prototype.moveDown = function() {
+    
     if ( !this.collision( 0,1, this.activeTetromino ))  {
         this.unDraw();
         this.y++;
@@ -114,15 +172,7 @@ Piece.prototype.moveDown = function() {
     } else {
         this.lock();
         p = randomPiece();
-       
     }
-}
-
-
-Piece.prototype.Down = function () {
-    this.unDraw();
-    this.y++;
-    this.draw();
 }
 
 
@@ -244,12 +294,14 @@ Piece.prototype.lock = function() {
             for (c = 0; c < COLS; c++) {
                 Board[0][c] = VACANT;
             }
-            
+            score += 100;
         }
     }
     // update the board
     drawBoard();
-
+    drawSide();
+    drawSaved();
+    scoreElement.innerHTML = score;
 }
 
 // Piece.prototype.pieceSaved = function() {
@@ -305,24 +357,6 @@ function CONTROL(event) {
 
 let dropStart = Date.now();
 
-// function drop() {
-
-//     var now = Date.now();
-//     var delta = now - dropStart;
-
-//     if ( delta > 1000 ) {
-//         p.moveDown;
-//         p.Down;
-//         dropStart = Date.now();
-//     }
-//     if ( !gameOver ) {
-//         requestAnimationFrame(drop);
-//     }
-
-// }
-
-// drop();
-let dropCounter = 0;
 let dropInterval = 1000;
 let lastTime = 0;
 let gameOver = false;
@@ -331,12 +365,15 @@ function update( time = 0 ) {
     var now = Date.now();
     var delta = now - dropStart;
 
-    if( delta > dropInterval ){
-        
+    if( delta > dropInterval ){     
+        p.drawSide(panel);
         p.moveDown();
+        score += 10;
+        scoreElement.innerHTML = score;
         dropStart = Date.now();
     }if (!gameOver) {
         requestAnimationFrame(update);
+        
     }
     
 }
