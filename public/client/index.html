@@ -7,23 +7,21 @@
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.1/addons/p5.dom.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.1/addons/p5.sound.js"></script>
   <link rel="stylesheet" type="text/css" href="gameStyle.css">
-  
-  
-  
 
 </head>
 
 <body>
-  <div class = "container">
-    <div class = "game">
-      <canvas id="tetris" width="200" height="400"></canvas>
-    </div>
-    <div class = "sidebar">
-      <canvas id="side" width="120" height="120"></canvas>
-      <canvas id="saved" width="120" height="120"></canvas>
-    </div>
-    
+  <template id="player_template">
+    <div class = "container">
+      <div class = "game">
+        <canvas id="tetris" width="200" height="400"></canvas>
+      </div>
+      <div class = "sidebar">
+        <canvas id="side" width="120" height="120"></canvas>
+        <canvas id="saved" width="120" height="120"></canvas>
+      </div>   
   </div>
+  </template>
   
   <div>
       Score : <div id="score">0</div>
