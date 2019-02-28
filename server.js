@@ -7,5 +7,3 @@ express()
     .use(express.static(path.join(__dirname, 'public')))
     .get('/', (req, res) => res.render('client/index'))
     .listen(PORT, () => console.log(`Listening on ${PORT}`))
-
-var io = require('socket.io')(server);
