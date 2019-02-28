@@ -1,9 +1,13 @@
 
 const express = require('express')
 const path = require('path')
-const PORT = process.env.PORT || 5000
+var app = express();
+var server = app.listen(process.env.PORT || 5000, listen);
 
-express()
-    .use(express.static(path.join(__dirname, 'public')))
-    .get('/', (req, res) => res.render('client/index'))
-    .listen(PORT, () => console.log(`Listening on ${PORT}`))
+function listen() {
+    var host = server.address().address;
+    var port = server.address().port;
+    console.log('Example app listening at http://' + host + ':' + port);
+}
+
+app.use(express.static('public/client/'));
