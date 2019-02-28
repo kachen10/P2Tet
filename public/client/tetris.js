@@ -119,7 +119,7 @@ function Piece ( tetromino, color ) {
     this.color = color;
 
     this.x = 3;
-    this.y = -2;
+    this.y = 0;
 }
 
 Piece.prototype.fill = function (color) {
