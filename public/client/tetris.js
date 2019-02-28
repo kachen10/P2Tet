@@ -44,19 +44,11 @@ for (row = 0; row < 6; row++) {
     }
 }
 
-function drawSaved() {
-    for (row = 0; row < 6; row++) {
-        for (col = 0; col < 6; col++) {
-            drawPiece(stack, col, row, currentPiece[row][col]);
-        }
-    }
-}
-
-function drawSide() {
+function drawSideBar( canvas ) {
 
     for (row = 0; row < 6; row++) {
         for (col = 0; col < 6; col++) {
-            drawPiece(panel, col, row, currentPiece[row][col]);
+            drawPiece(canvas, col, row, currentPiece[row][col]);
         }
     }
 }
@@ -90,8 +82,9 @@ function drawBoard() {
 }
 
 drawBoard();
-drawSide();
-drawSaved();
+drawSideBar(panel);
+drawSideBar(stack);
+
 
 const PIECES = [
     [Z, '#fa983a' ],
@@ -110,16 +103,19 @@ function randomPiece() {
 
 var p = randomPiece();
 var saved = 0;
+var current = p;
+
 
 function Piece ( tetromino, color ) {
     this.tetromino= tetromino;
     this.direction = 0;
     
     this.activeTetromino = this.tetromino[this.direction];
+    
     this.color = color;
 
     this.x = 3;
-    this.y = 0;
+    this.y = -1;
 }
 
 Piece.prototype.fill = function (color) {
@@ -137,7 +133,6 @@ Piece.prototype.sideFill = function ( canvas, color) {
     let length = p.activeTetromino.length;
     length = 6 - length;
     let start = length - 1;
-    console.log("start", start);
     for (r = 0; r < this.activeTetromino.length; r++) {
         for (c = 0; c < this.activeTetromino.length; c++) {
             // we draw only occupied squares
@@ -161,10 +156,7 @@ Piece.prototype.drawSide = function( canvas ) {
     this.sideFill( canvas, this.color );
 }
 
-
-Piece.prototype.unDrawSide = function( canvas ) {
-    this.sideFill( canvas, VACANT );
-}
+current.drawSide(panel);
 
 Piece.prototype.moveDown = function() {
     
@@ -175,6 +167,9 @@ Piece.prototype.moveDown = function() {
     } else {
         this.lock();
         p = randomPiece();
+        current = p;
+        current.drawSide(panel);
+        
     }
 }
 
@@ -205,6 +200,8 @@ Piece.prototype.FastDown = function () {
     this.draw();
     this.lock();
     p = randomPiece();
+    current = p;  
+    current.drawSide(panel);
     
 }
 
@@ -249,7 +246,6 @@ Piece.prototype.rotate = function() {
             offset = 1;
         }
     } 
-    console.log("offset", offset);
     if (!this.collision(offset, 0, temp)) {
         this.unDraw();
         this.x += offset;
@@ -302,8 +298,8 @@ Piece.prototype.lock = function() {
     }
     // update the board
     drawBoard();
-    drawSide();
-    drawSaved();
+    drawSideBar(panel);
+    
     scoreElement.innerHTML = score;
 }
 
@@ -311,13 +307,17 @@ Piece.prototype.pieceSaved = function() {
 
     if ( saved == 0 ) {
         p.unDraw();
-        saved = this.activeTetromino;
-        this.activeTetromino = randomPiece();
+        p.drawSide( stack );
+        console.log("noUnDraw");
+        saved = p;
+        p = randomPiece();
         p.draw();
-    } else {
+    } else if ( saved ) {
         p.unDraw();
-        var temp = this.activeTetromino;
-        this.activeTetromino = saved;
+        drawSideBar(stack);
+        p.drawSide(stack);
+        var temp = p;
+        p = saved;
         saved = temp;
         p.draw();
     }
@@ -350,9 +350,10 @@ function CONTROL(event) {
     else if (event.keyCode == KeyPressed.space) {
         p.FastDown();
     }
-    // else if (event.keyCode == KeyPressed.shift) {
-    //     p.pieceSaved();
-    // }
+    else if (event.keyCode == KeyPressed.shift) {
+        p.pieceSaved();
+        console.log("piecedSaved");
+    }
 
 
 }
@@ -364,17 +365,19 @@ let dropInterval = 1000;
 let lastTime = 0;
 let gameOver = false;
 function update( time = 0 ) {
+
     
     var now = Date.now();
     var delta = now - dropStart;
 
     if( delta > dropInterval ){     
-        p.drawSide(panel);
+        
         p.moveDown();
         score += 10;
         scoreElement.innerHTML = score;
         dropStart = Date.now();
     }if (!gameOver) {
+
         requestAnimationFrame(update);
         
     }
