@@ -1,6 +1,5 @@
 
 const express = require('express')
-const path = require('path')
 var app = express();
 var server = app.listen(process.env.PORT || 5000, listen);
 
@@ -12,6 +11,19 @@ function listen() {
 
 app.use(express.static('public/client/'));
 
+function Piece(tetromino, color) {
+    this.tetromino = tetromino;
+    this.direction = 0;
+
+    this.activeTetromino = this.tetromino[this.direction];
+
+    this.color = color;
+
+    this.x = 3;
+    this.y = -1;
+}
+
+
 
 // WebSocket Portion
 // WebSockets work with the HTTP server
@@ -20,9 +32,9 @@ var io = require('socket.io')(server);
 setInterval(heartbeat, 33);
 
 function heartbeat() {
-    // io.sockets.emit('heartbeat', blobs);
+    io.sockets.emit('heartbeat');
+    // console.log("heartbeat");
 }
-
 
 
 // Register a callback function to run when we have an individual connection
@@ -36,14 +48,15 @@ io.sockets.on('connection',
 
         socket.on('start',
             function (data) {
-                console.log("start");
+                console.log("start");;
+            
             }
         );
 
         socket.on('update',
             function (data) {
-                //console.log(socket.id + " " + data.x + " " + data.y + " " + data.r);
                 console.log("update");
+                
             }
         );
 
