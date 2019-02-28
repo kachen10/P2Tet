@@ -11,6 +11,19 @@ function listen() {
 
 app.use(express.static('public/client/'));
 
+function Piece(tetromino, color) {
+    this.tetromino = tetromino;
+    this.direction = 0;
+
+    this.activeTetromino = this.tetromino[this.direction];
+
+    this.color = color;
+
+    this.x = 3;
+    this.y = -1;
+}
+
+
 
 // WebSocket Portion
 // WebSockets work with the HTTP server
@@ -19,7 +32,8 @@ var io = require('socket.io')(server);
 setInterval(heartbeat, 33);
 
 function heartbeat() {
-    io.sockets.emit('heartbeat', blobs);
+    io.sockets.emit('heartbeat');
+    // console.log("heartbeat");
 }
 
 
@@ -34,24 +48,15 @@ io.sockets.on('connection',
 
         socket.on('start',
             function (data) {
-                console.log(socket.id + " " + data.x + " " + data.y + " " + data.r);
-                var blob = new Blob(socket.id, data.x, data.y, data.r);
-                blobs.push(blob);
+                console.log("start");;
+            
             }
         );
 
         socket.on('update',
             function (data) {
-                //console.log(socket.id + " " + data.x + " " + data.y + " " + data.r);
-                var blob;
-                for (var i = 0; i < blobs.length; i++) {
-                    if (socket.id == blobs[i].id) {
-                        blob = blobs[i];
-                    }
-                }
-                blob.x = data.x;
-                blob.y = data.y;
-                blob.r = data.r;
+                console.log("update");
+                
             }
         );
 
