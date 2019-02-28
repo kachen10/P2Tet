@@ -3,10 +3,6 @@ const express = require('express')
 var app = express();
 var server = app.listen(process.env.PORT || 5000, listen);
 
-const server = express()
-    .use((req, res) => res.sendFile(INDEX))
-    .listen(PORT, () => console.log(`Listening on ${PORT}`));
-
 function listen() {
     var host = server.address().address;
     var port = server.address().port;
