@@ -53,8 +53,8 @@ function drawSaved() {
     }
 }
 
-
 function drawSide() {
+
     for (row = 0; row < 6; row++) {
         for (col = 0; col < 6; col++) {
             drawPiece(panel, col, row, currentPiece[row][col]);
@@ -135,11 +135,15 @@ Piece.prototype.fill = function (color) {
 }
 
 Piece.prototype.sideFill = function ( canvas, color) {
+    let length = p.activeTetromino.length;
+    length = 6 - length;
+    let start = length - 1;
+    console.log("start", start);
     for (r = 0; r < this.activeTetromino.length; r++) {
         for (c = 0; c < this.activeTetromino.length; c++) {
             // we draw only occupied squares
             if (this.activeTetromino[r][c]) {
-                drawPiece(canvas, c, r, color);
+                drawPiece(canvas, c+start, r+start, color);
             }
         }
     }
