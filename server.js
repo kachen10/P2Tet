@@ -1,10 +1,10 @@
 
 var express = require('express');
 var app = express();
+var server = app.listen(process.env.PORT || 5000, listen);
+console.log("server.address()", server.address());
 
-var server = app.listen(process.env.PORT || 5000);
-console.log("server.address()", server.address().address);
-
+// This call back just tells us that the server has started
 function listen() {
     var host = server.address().address;
     var port = server.address().port;
@@ -13,9 +13,6 @@ function listen() {
 
 app.use(express.static('public/client/'));
 
-
-// WebSocket Portion
-// WebSockets work with the HTTP server
 var io = require('socket.io')(server);
 
 setInterval(heartbeat, 33);
@@ -24,10 +21,6 @@ function heartbeat() {
     io.sockets.emit('heartbeat');
     // console.log("heartbeat");
 }
-
-var app = require('express')();
-var server = require('http').Server(app);
-var io = require('socket.io')(server);
 
 // Register a callback function to run when we have an individual connection
 // This is run for each individual user that connects
