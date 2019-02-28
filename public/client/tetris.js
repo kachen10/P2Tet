@@ -20,7 +20,7 @@ var KO = false;
 var score = 0;
 var time = 0;
 
-var socket = io.connect('http://ptetris.herokuapp.com/');
+var socket = io.connect('http://ptetris.herokuapp.com');
 
 socket.on('news', function (data) {
     console.log(data);
