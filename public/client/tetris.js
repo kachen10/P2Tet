@@ -15,11 +15,10 @@ const COLS = 10;
 const SQ = 20;
 const VACANT = '#dcdde1';
 
-
+// var socket = io.connect('http://localhost:3000');
 var KO = false;
 var score = 0;
 var time = 0;
-
 
 var Board = [];
 for ( row = 0; row < ROWS; row++ ) {
@@ -99,7 +98,7 @@ const PIECES = [
     [T, '#3c6382' ],
     [I, '#e55039' ],
     [J, '#38ada9' ],
-    [S, '#b8e994' ],
+    [S, '#44bd32' ],
     [L, '#e84393' ],
     [O, '#a29bfe' ]
 ];
