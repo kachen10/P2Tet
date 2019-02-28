@@ -15,10 +15,17 @@ const COLS = 10;
 const SQ = 20;
 const VACANT = '#dcdde1';
 
-// var socket = io.connect('http://localhost:3000');
+
 var KO = false;
 var score = 0;
 var time = 0;
+
+var socket = io.connect('http://ptetris.herokuapp.com/');
+socket.on('news', function (data) {
+    console.log(data);
+    socket.emit('my other event', { my: 'data' });
+});
+
 
 var Board = [];
 for ( row = 0; row < ROWS; row++ ) {
