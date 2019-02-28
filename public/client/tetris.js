@@ -307,22 +307,22 @@ Piece.prototype.lock = function() {
     scoreElement.innerHTML = score;
 }
 
-// Piece.prototype.pieceSaved = function() {
+Piece.prototype.pieceSaved = function() {
 
-//     if ( saved == 0 ) {
-//         p.unDraw();
-//         saved = this.activeTetromino;
-//         this.activeTetromino = randomPiece();
-//         p.draw();
-//     } else {
-//         p.unDraw();
-//         var temp = this.activeTetromino;
-//         this.activeTetromino = saved;
-//         saved = temp;
-//         p.draw();
-//     }
+    if ( saved == 0 ) {
+        p.unDraw();
+        saved = this.activeTetromino;
+        this.activeTetromino = randomPiece();
+        p.draw();
+    } else {
+        p.unDraw();
+        var temp = this.activeTetromino;
+        this.activeTetromino = saved;
+        saved = temp;
+        p.draw();
+    }
     
-// }
+}
 
 
 document.addEventListener("keydown", CONTROL);
