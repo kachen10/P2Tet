@@ -1,40 +1,61 @@
+var increment = 0.1;
+var scl = 10;
+var cols, rows;
 
-var scale = 20;
+var zoff = 0;
 
-var start = 0;
-var increment = 0.02;
-var cols, rowsl
+var fr;
 
+var particles = [];
+
+var flowfield;
 
 function setup() {
-    createCanvas( 400, 400 );
-    cols = floor(width /scale);
-    cols = floor(height /scale);
+    createCanvas(400, 400);
+    // colorMode(HSB, 255);
+    cols = floor(width / scl);
+    rows = floor(height / scl);
+    fr = createP('');
+
+    flowfield = new Array(cols * rows);
+
+    for (var i = 0; i < 300; i++) {
+        particles[i] = new Particle();
+    }
+    // background(51);
 }
 
-
 function draw() {
-    
     var yoff = 0;
-
-    loadPixels();
-    for (var x = 0; x < width; x++) {
+    background(255);
+    for (var y = 0; y < rows; y++) {
         var xoff = 0;
-        for (var y = 0; y < height; y++) {
-
-            var index = ( x + y * width) * 4;
-            var r = noise(xoff, yoff) * 255;
-            pixels[index+0] = r;
-            pixels[index+1] = r;
-            pixels[index+2] = r;
-            pixels[index+3] = r;
-
+        for (var x = 0; x < cols; x++) {
+            var index = x + y * cols;
+            var angle = noise(xoff, yoff, zoff) * TWO_PI * 4;
+            var v = p5.Vector.fromAngle(angle);
+            // v.setMag(1);
+            // flowfield[index] = v;
             xoff += increment;
-        }  
+            // stroke(0, 50);
+            push();
+            translate(x * scl, y * scl);
+            rotate(v.heading());
+            strokeWeight(1);
+            line(0, 0, scl, 0);
+            pop();
+        }
         yoff += increment;
+
+        zoff += 0.0003;
     }
-    updatePixels();
-    // noLoop();
-    
-    
+
+    // for (var i = 0; i < particles.length; i++) {
+    //     particles[i].follow(flowfield);
+    //     particles[i].update();
+    //     particles[i].edges();
+    //     particles[i].show();
+    // }
+
+    fr.html(floor(frameRate()));
 }
