@@ -30,6 +30,8 @@ io.sockets.on('connection',
         console.log("connect");
 
         console.log("We have a new client: " + socket.id);
+        var p = randomPiece();
+        current.drawSide(stack);
 
 
         socket.on('start',
