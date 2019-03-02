@@ -1,4 +1,3 @@
-
 class Tetris {
 
     constructor(tetromino, color) {
@@ -38,6 +37,18 @@ class Tetris {
         }
     }
 
+    sideFill2(canvas, color) {
+        
+        for (var r = 0; r < this.activeTetromino.length; r++) {
+            for (var c = 0; c < this.activeTetromino.length; c++) {
+                // we draw only occupied squares
+                if (this.activeTetromino[r][c]) {
+                    drawPiece(canvas, this.x + c, this.y + r, color);
+                }
+            }
+        }
+    }
+
     draw() {
         this.fill(this.color);
     }
@@ -47,11 +58,19 @@ class Tetris {
         this.fill(VACANT);
     }
 
+    drawSide2(canvas) {
+        this.sideFill2(canvas, this.color);
+    }
+
     drawSide(canvas) {
         this.sideFill(canvas, this.color);
     }
 
-    
+    undrawSide(canvas) {
+        this.sideFill2(canvas, VACANT);
+    }
+
+
     moveDown() {
 
         if (!this.collision(0, 1, this.activeTetromino)) {
@@ -66,6 +85,20 @@ class Tetris {
 
         }
     }
+
+    moveDownTest() {
+
+        if (!this.collision(0, 1, this.activeTetromino)) {
+            this.undrawSide(Arena);
+            this.y++;
+            this.drawSide2(Arena);
+        } else {
+            this.lock();
+            newPiece = randomPiece();
+
+        }
+    }
+
 
 
     moveLeft() {
@@ -189,7 +222,7 @@ class Tetris {
             }
         }
         // update the board
-        drawBoard( Board );
+        drawBoard(Board);
         drawSideBar(panel);
 
         scoreElement.innerHTML = score;

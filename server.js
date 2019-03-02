@@ -21,17 +21,21 @@ function heartbeat() {
     io.sockets.emit('heartbeat');
     // console.log("heartbeat");
 }
-
+var clients = 0;
 // Register a callback function to run when we have an individual connection
 // This is run for each individual user that connects
 io.sockets.on('connection',
     // We are given a websocket object in our function
     function (socket) {
         console.log("connect");
-
         console.log("We have a new client: " + socket.id);
+        
+        ++clients;
+        socket.emit('users_count', clients);
+        console.log("clients: ", clients);
 
         socket.on('test',
+
             function (data) {
                 console.log("test received");;
 
@@ -40,14 +44,17 @@ io.sockets.on('connection',
 
         socket.on('start',
             function (data) {
-                console.log("start");;
+                
+                console.log("start [p");;
             
             }
         );
 
         socket.on('update',
             function (data) {
-                console.log("update");
+                data.player += 1;
+                
+                console.log("update: player count " + data.player);
                 
             }
         );
@@ -56,6 +63,7 @@ io.sockets.on('connection',
 
         socket.on('disconnect', function () {
             console.log("Client has disconnected");
+            clients--;
         });
     }
 );
