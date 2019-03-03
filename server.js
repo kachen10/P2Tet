@@ -16,25 +16,23 @@ app.use(express.static('public/client/'));
 var io = require('socket.io')(server);
 
 setInterval(heartbeat, 33);
+var newPlayeriD;
 
-function heartbeat() {
-    io.sockets.emit('heartbeat');
-    // console.log("heartbeat");
-}
 var clients = 0;
-// Register a callback function to run when we have an individual connection
-// This is run for each individual user that connects
 io.sockets.on('connection',
     // We are given a websocket object in our function
     function (socket) {
         console.log("connect");
         console.log("We have a new client: " + socket.id);
-        
+       
         ++clients;
         socket.emit('users_count', clients);
         console.log("clients: ", clients);
 
-        
+        socket.on('playerID',
+            function ( data ){
+                newPlayerID = data;
+        });
 
         socket.on('update',
             function (data) {

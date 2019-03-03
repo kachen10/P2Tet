@@ -24,7 +24,8 @@ var score = 0;
 var time = 0;
 var incomingPlayer = 0;
 var newPiece = null;
-var multiplayer = false;
+var multiplayer = false; 
+var playerID;
 
 // var socket = io.connect('http://ptetris.herokuapp.com');
 var socket = io.connect('http://localhost:5000');
@@ -33,6 +34,8 @@ var socket = io.connect('http://localhost:5000');
 socket.on('users_count', function (data) {   
     incomingPlayer = data;
     console.log("incomingPlayer", incomingPlayer);
+    playerID = socket.id;
+    io.sockets.emit('playerID', playerID);
     console.log("Connection");
 });
 
