@@ -34,28 +34,17 @@ io.sockets.on('connection',
         socket.emit('users_count', clients);
         console.log("clients: ", clients);
 
-        socket.on('test',
-
-            function (data) {
-                console.log("test received");;
-
-            }
-        );
-
-        socket.on('start',
-            function (data) {
-                
-                console.log("start [p");;
-            
-            }
-        );
+        
 
         socket.on('update',
             function (data) {
-                data.player += 1;
-                
-                console.log("update: player count " + data.player);
-                
+                var serverTetris = {
+                    piece : data.piece,
+                    x : data.x,
+                    y : data.y
+                }
+                socket.emit('draw', serverTetris);
+                console.log("UPDATE");
             }
         );
 

@@ -135,8 +135,6 @@ var current = p;
 
 current.drawSide(panel); 
 
-
-
 document.addEventListener("keydown", CONTROL);
 var KeyPressed = {
     left: 37, up: 38, right: 39, down: 40,
@@ -188,6 +186,23 @@ function drawMultiplayer() {
     }
 }
 
+function serverUpdate( tetris ) {
+    var client = {
+        piece: tetris,
+        x: tetris.x,
+        y:tetris.y
+    }
+    socket.emit('update', client);
+}
+
+function serverDraw(tetris) {
+    socket.on('draw',
+        function (data) {
+            tetris = data.piece;
+            console.log("test received");;
+        }
+    );
+}
 
 function update( time = 0 ) {  
 
@@ -203,17 +218,19 @@ function update( time = 0 ) {
     if( delta > dropInterval ){ 
         
         if (newPiece != null) {
-            newPiece.moveDownTest();
+            serverDraw( newPiece );
+            newPiece.moveDownTest();        
         }
-    
+        
+
         p.moveDown();
-        score += 10;
+        serverUpdate( p );
+        score += 100;
         scoreElement.innerHTML = score;
         dropStart = Date.now();
-    }if (!gameOver) {
 
+    }if (!gameOver) {
         requestAnimationFrame(update);
-        
     }
     
 }
