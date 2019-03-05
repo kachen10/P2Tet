@@ -15,7 +15,6 @@ app.use(express.static('public/client/'));
 
 var io = require('socket.io')(server);
 
-setInterval(heartbeat, 33);
 var newPlayeriD;
 
 var clients = 0;
