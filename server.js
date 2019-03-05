@@ -18,14 +18,29 @@ var io = require('socket.io')(server);
 var newPlayeriD;
 
 var clients = 0;
+
+function createId(len = 6, chars = 'abcdefghjkmnopqrstvwxyz01234567890') {
+    let id = '';
+    while (len--) {
+        id += chars[Math.random() * chars.length | 0];
+    }
+    return id;
+}
+
 io.sockets.on('connection',
     // We are given a websocket object in our function
     function (socket) {
         console.log("connect");
-        console.log("We have a new client: " + socket.id);
+        var id = createId();
+        console.log("We have a new client: " + id);
+        
        
         ++clients;
-        socket.emit('users_count', clients);
+        var client = {
+            count: clients,
+            id: id,
+        }
+        socket.emit('users_count', client);
         console.log("clients: ", clients);
 
         socket.on('playerID',
