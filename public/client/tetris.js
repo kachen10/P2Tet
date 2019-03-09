@@ -22,10 +22,12 @@ const VACANT = '#dcdde1';
 var KO = false;
 var score = 0;
 var time = 0;
-var incomingPlayer = 0;
 var newPiece = null;
 var multiplayer = false; 
 var playerID;
+var p;
+var saved = 0;
+var current = p;
 
 function createId(len = 6, chars = 'abcdefghjkmnopqrstvwxyz01234567890') {
     let id = '';
@@ -52,34 +54,31 @@ function randomPiece() {
     return temp;
 }
 
+function getSessionId() {
+    const id = window.location.hash.split('#')[1];
+    return id;
+}
+
 var address = 'http://localhost:5000';
 var sessionId = null;
 // var socket = io.connect('http://ptetris.herokuapp.com');
 if (window.location.hash) {
     console.log("window check");
-    sessionId = window.location.hash.split('#')[1];
+    sessionId = getSessionId();
     address += "/#" + sessionId;
     console.log("Address: ", address);  
 }
 var socket = io.connect(address);
 console.log("NEW PLAYER");
+var idPlayer = createId()
 var client_data = {
-    id: createId(),
-    tetro:randomPiece(),
+    id: idPlayer,
+    tetro:randomPiece(idPlayer),
     session:sessionId
 }
 if (!window.location.hash) { window.location.hash = client_data.id; }
 
 socket.emit("start", client_data);
-
-
-socket.on('users_count', function (data) {   
-    incomingPlayer = data.client;
-    console.log("incomingPlayer", incomingPlayer);
-    playerID = data.id;
-    socket.emit('playerID', playerID);
-    console.log("Connection");
-});
 
 
 var Board = new board();
@@ -154,11 +153,17 @@ drawSideBar(panel);
 drawSideBar(stack);
 
 
-var p = randomPiece();
-var saved = 0;
-var current = p;
+// var p = randomPiece();
+socket.on('newPlayer',
+    function (data) {
+        p = new Tetris(data.tetromino, data.color);
+        saved = 0;
+        current = p;
+        current.drawSide(panel); 
+    });
 
-current.drawSide(panel); 
+
+
 
 document.addEventListener("keydown", CONTROL);
 var KeyPressed = {
@@ -168,6 +173,7 @@ var KeyPressed = {
 function CONTROL(event) {
     if (event.keyCode == KeyPressed.right) {
         p.moveRight();
+        socket.emit('update', p);
         dropStart = Date.now();
     }
     else if (event.keyCode == KeyPressed.left) {
@@ -200,49 +206,21 @@ let dropInterval = 1000;
 let lastTime = 0;
 let gameOver = false;
 
-function drawMultiplayer() {
-    // console.log("Draw player called");
-    if (multiplayer && player.newBoard == null) {
-        player.newBoard = new board();
-        console.log("Draw player");
-        player.newCanvas();
-        newPiece = randomPiece();
-        drawBoardTemp(Arena, player.newBoard);
-    }
-}
-
-function serverUpdate( tetris ) {
-    var client = {
-        piece: tetris,
-        x: tetris.x,
-        y:tetris.y
-    }
-    socket.emit('update', client);
-}
-
-function serverDraw(tetris) {
-    socket.on('draw',
-        function (data) {
-            tetris = data.piece;
-            console.log("test received");;
-        }
-    );
-}
-
 socket.on('GameOn',
     function (data) {
         console.log("GAMEON");
-        update();
+        sessionId = getSessionId();
+        player.newBoard = new board();
+        player.newCanvas();
+        drawBoardTemp(Arena, player.newBoard);
+        console.log("Draw");
+        // if ( data[1].id == sessionId )
+        
+       
     }
 );
 
 function update( time = 0 ) {  
-
-    if (incomingPlayer >= 2) {
-        multiplayer = true;   
-        drawMultiplayer();
-    } else { multiplayer = false; }
-
 
     var now = Date.now();
     var delta = now - dropStart;
@@ -254,16 +232,30 @@ function update( time = 0 ) {
             newPiece.moveDownTest();        
         }
         
-
+        socket.on('draw',
+            function (data) {
+                if ( data.id != p.id ){
+                    console.log("test received");
+                    console.log("data.id: ", data.id);
+                    console.log("p.id: ", p.id);
+                }
+                else {
+                    console.log("same item received");
+                    console.log("data2.id: ", data.id);
+                    console.log("p2.id: ", p.id);
+                }
+            }
+        );
+        
         p.moveDown();
-        serverUpdate( p );
+        socket.emit('update', p);
         score += 100;
         scoreElement.innerHTML = score;
         dropStart = Date.now();
 
-    }if (!gameOver) {
+    } if (!gameOver) {
         requestAnimationFrame(update);
-    }
+    } 
     
 }
-
+update();

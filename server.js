@@ -39,13 +39,6 @@ function getSession(id) {
     return sessions.get(id);
 }
 
-function randomPiece() {
-    var random = Math.floor(Math.random() * PIECES.length);
-    var temp = new Tetris(PIECES[random][0], PIECES[random][1]);
-
-    return temp;
-}
-
 
 function Player(id, tetris) {
     this.tetromino = tetris.tetromino;
@@ -71,6 +64,7 @@ io.sockets.on('connection',
             console.log("PLAYERS RECEIVED: ", clients);    
             var player = new Player(data.id, data.tetro);
             players.push(player);
+            socket.emit("newPlayer", player );
             console.log(player.id);    
             if ( data.session == null ) {
                 const session = createSession( player.id );
@@ -87,23 +81,15 @@ io.sockets.on('connection',
                 if (clients == 2) {
                     console.log("ServerSide: GameOn");
                     socket.emit("GameOn", session.clients);
+                    }
                 }
-                }
-                
-            
-            
             }
         );
 
         socket.on('update',
             function (data) {
-                var serverTetris = {
-                    piece : data.piece,
-                    x : data.x,
-                    y : data.y
-                }
                 
-                socket.emit('draw', serverTetris);
+                socket.emit('draw', data);
                 // console.log("UPDATE");
             }
         );

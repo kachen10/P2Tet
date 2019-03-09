@@ -1,12 +1,13 @@
 class Tetris {
 
-    constructor(tetromino, color) {
+    constructor(tetromino, color, id) {
         this.tetromino = tetromino;
         this.direction = 0;
 
         this.activeTetromino = this.tetromino[this.direction];
 
         this.color = color;
+        this.id = id;
 
         this.x = 3;
         this.y = -1;
