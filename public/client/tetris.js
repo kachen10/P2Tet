@@ -173,7 +173,7 @@ var KeyPressed = {
 function CONTROL(event) {
     if (event.keyCode == KeyPressed.right) {
         p.moveRight();
-        socket.emit('update', p);
+        
         dropStart = Date.now();
     }
     else if (event.keyCode == KeyPressed.left) {
@@ -227,10 +227,6 @@ function update( time = 0 ) {
 
     if( delta > dropInterval ){ 
         
-        if (newPiece != null) {
-            serverDraw( newPiece );
-            newPiece.moveDownTest();        
-        }
         
         socket.on('draw',
             function (data) {
@@ -247,8 +243,27 @@ function update( time = 0 ) {
             }
         );
         
+        socket.on('nice game', function(data) {
+            console.log("in GAME, recieved: ", data);
+            newPiece = new Tetris(data.piece.tetromino, data.piece.color, data.piece.id);
+            // newPiece = data.piece;
+
+            console.log("data piece: ", data.piece);
+            console.log("newpiece: ", newPiece);
+            // serverDraw(newPiece);
+            newPiece.moveDownTest();
+            
+        });
+        
         p.moveDown();
-        socket.emit('update', p);
+        // sending to all clients in 'game1' and/or in 'game2' room, except sender
+        sessionId = getSessionId();
+        var moveData = {
+            piece: p,
+            sessionId: sessionId
+        }
+        socket.emit("move", moveData);
+
         score += 100;
         scoreElement.innerHTML = score;
         dropStart = Date.now();

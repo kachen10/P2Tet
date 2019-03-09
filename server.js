@@ -69,6 +69,7 @@ io.sockets.on('connection',
             if ( data.session == null ) {
                 const session = createSession( player.id );
                 session.join(player);
+                socket.join(player.id)
                 // console.log("CreatedSession: ", session);
             } else {
                 const sessionId = data.session;
@@ -76,6 +77,7 @@ io.sockets.on('connection',
                 const session = getSession( sessionId );
                 console.log("JoinedSession", session);
                 session.join(player);
+                socket.join(sessionId)
                 console.log("Player Joined");
                 console.log("List of Players: ", session.clients);
                 if (clients == 2) {
@@ -85,6 +87,19 @@ io.sockets.on('connection',
                 }
             }
         );
+
+        socket.on('move',
+        
+            function(data) {
+                console.log("Data received in move");
+                console.log("sessionId =", data.sessionId);
+                var send = {
+                    message: "let's play a game (too)",
+                    piece: data.piece
+                }
+                socket.to(data.sessionId).emit('nice game', send);
+            });
+        
 
         socket.on('update',
             function (data) {
