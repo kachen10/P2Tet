@@ -46,7 +46,6 @@ function draw() {
             pop();
         }
         yoff += increment;
-
         zoff += 0.0003;
     }
 
