@@ -52,15 +52,24 @@ function randomPiece() {
     return temp;
 }
 
-
+var address = 'http://localhost:5000';
+var sessionId = null;
 // var socket = io.connect('http://ptetris.herokuapp.com');
-var socket = io.connect('http://localhost:5000');
+if (window.location.hash) {
+    console.log("window check");
+    sessionId = window.location.hash.split('#')[1];
+    address += "/#" + sessionId;
+    console.log("Address: ", address);  
+}
+var socket = io.connect(address);
 console.log("NEW PLAYER");
 var client_data = {
     id: createId(),
-    tetro:randomPiece()
+    tetro:randomPiece(),
+    session:sessionId
 }
-window.location.hash = client_data.id;
+if (!window.location.hash) { window.location.hash = client_data.id; }
+
 socket.emit("start", client_data);
 
 
@@ -220,6 +229,13 @@ function serverDraw(tetris) {
     );
 }
 
+socket.on('GameOn',
+    function (data) {
+        console.log("GAMEON");
+        update();
+    }
+);
+
 function update( time = 0 ) {  
 
     if (incomingPlayer >= 2) {
@@ -250,4 +266,4 @@ function update( time = 0 ) {
     }
     
 }
-update();
+
