@@ -27,15 +27,48 @@ var newPiece = null;
 var multiplayer = false; 
 var playerID;
 
+function createId(len = 6, chars = 'abcdefghjkmnopqrstvwxyz01234567890') {
+    let id = '';
+    while (len--) {
+        id += chars[Math.random() * chars.length | 0];
+    }
+    return id;
+}
+
+const PIECES = [
+    [Z, '#fa983a' ],
+    [T, '#3c6382' ],
+    [I, '#e55039' ],
+    [J, '#38ada9' ],
+    [S, '#44bd32' ],
+    [L, '#e84393' ],
+    [O, '#a29bfe' ]
+];
+
+function randomPiece() {
+    var random = Math.floor(Math.random() * PIECES.length);
+    var temp = new Tetris(PIECES[random][0], PIECES[random][1]);
+
+    return temp;
+}
+
+
 // var socket = io.connect('http://ptetris.herokuapp.com');
 var socket = io.connect('http://localhost:5000');
+console.log("NEW PLAYER");
+var client_data = {
+    id: createId(),
+    tetro:randomPiece()
+}
+window.location.hash = client_data.id;
+socket.emit("start", client_data);
 
 
 socket.on('users_count', function (data) {   
-    incomingPlayer = data;
+    incomingPlayer = data.client;
     console.log("incomingPlayer", incomingPlayer);
-    playerID = socket.id;
-    io.sockets.emit('playerID', playerID);
+    playerID = data.id;
+    socket.emit('playerID', playerID);
     console.log("Connection");
 });
 
@@ -111,26 +144,6 @@ drawBoard( Board );
 drawSideBar(panel);
 drawSideBar(stack);
 
-
-const PIECES = [
-    [Z, '#fa983a' ],
-    [T, '#3c6382' ],
-    [I, '#e55039' ],
-    [J, '#38ada9' ],
-    [S, '#44bd32' ],
-    [L, '#e84393' ],
-    [O, '#a29bfe' ]
-];
-
-
-
-
-function randomPiece() {
-    var random = Math.floor(Math.random() * PIECES.length);
-    var temp = new Tetris(PIECES[random][0], PIECES[random][1]);
-
-    return temp;
-}
 
 var p = randomPiece();
 var saved = 0;
