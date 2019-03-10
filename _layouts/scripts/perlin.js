@@ -1,7 +1,7 @@
+
 var increment = 0.1;
 var scl = 10;
 var cols, rows;
-
 var zoff = 0;
 
 var fr;
@@ -15,7 +15,7 @@ function setup() {
     // colorMode(HSB, 255);
     cols = floor(width / scl);
     rows = floor(height / scl);
-    fr = createP('');
+    // fr = createP('');
 
     flowfield = new Array(cols * rows);
 
