@@ -59,7 +59,8 @@ function getSessionId() {
     return id;
 }
 
-var address = 'http://localhost:5000';
+// var address = 'http://localhost:5000';
+var address = 'http://ptetris.herokuapp.com';
 var sessionId = null;
 // var socket = io.connect('http://ptetris.herokuapp.com');
 if (window.location.hash) {
