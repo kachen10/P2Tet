@@ -57,7 +57,7 @@ io.sockets.on('connection',
     // We are given a websocket object in our function
     function (socket) {
         console.log("connect");
-        clients++;
+        
         socket.on('start',
         function(data) {
             
@@ -66,12 +66,14 @@ io.sockets.on('connection',
             players.push(player);
             socket.emit("newPlayer", player );
             console.log(player.id);    
-            if ( data.session == null ) {
+            if ( data.session == null || clients >= 2) {
+                clients++;
                 const session = createSession( player.id );
                 session.join(player);
                 socket.join(player.id)
                 // console.log("CreatedSession: ", session);
-            } else {
+            } else if (clients < 2) {
+                clients++;
                 const sessionId = data.session;
                 console.log("SessionID", sessionId);
                 const session = getSession( sessionId );
@@ -88,26 +90,72 @@ io.sockets.on('connection',
             }
         );
 
-        socket.on('move',
+        socket.on('moveDown',
         
             function(data) {
-                console.log("Data received in move");
-                console.log("sessionId =", data.sessionId);
+                console.log("Data received in moveDown");
+                // console.log("sessionId =", data.sessionId);
                 var send = {
                     message: "let's play a game (too)",
                     piece: data.piece
                 }
-                socket.to(data.sessionId).emit('nice game', send);
+                socket.to(data.sessionId).emit('Down', send);
+                console.log("Data emitted");
             });
         
+        socket.on('moveLeft',
 
-        socket.on('update',
             function (data) {
-                
-                socket.emit('draw', data);
-                // console.log("UPDATE");
-            }
-        );
+                console.log("Data received in moveLeft");
+                // console.log("sessionId =", data.sessionId);
+                var send = {
+                    message: "let's play a game (too)",
+                    piece: data.piece
+                }
+                socket.to(data.sessionId).emit('Left', send);
+                console.log("Data emitted");
+            });
+        socket.on('moveRight',
+
+            function (data) {
+                console.log("Data received in moveRight");
+                // console.log("sessionId =", data.sessionId);
+                var send = {
+                    message: "let's play a game (too)",
+                    piece: data.piece
+                }
+                socket.to(data.sessionId).emit('Right', send);
+                console.log("Data emitted");
+            });
+        socket.on('moveFastDown',
+
+            function (data) {
+                console.log("Data received in moveFastDown");
+                // console.log("sessionId =", data.sessionId);
+                var send = {
+                    message: "let's play a game (too)",
+                    piece: data.piece
+                }
+                socket.to(data.sessionId).emit('FastDown', send);
+                console.log("Data emitted");
+            });
+        socket.on('moveRotate',
+
+            function (data) {
+                console.log("Data received in move");
+                // console.log("sessionId =", data.sessionId);
+                var send = {
+                    message: "let's play a game (too)",
+                    piece: data.piece
+                }
+                socket.to(data.sessionId).emit('Rotate', send);
+                console.log("Data emitted");
+            });
+
+
+
+
+
 
         socket.on('disconnect', function () {
             console.log("Client has disconnected");

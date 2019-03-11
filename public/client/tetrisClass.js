@@ -109,12 +109,26 @@ class Tetris {
             this.draw();
         }
     }
+    moveLeftTest() {
+        if (!this.collision(-1, 0, this.activeTetromino)) {
+            this.undrawSide(Arena);
+            this.x--;
+            this.drawSide2(Arena);
+        }
+    }
 
     moveRight() {
         if (!this.collision(1, 0, this.activeTetromino)) {
             this.unDraw();
             this.x++;
             this.draw();
+        }
+    }
+    moveRightTest() {
+        if (!this.collision(1, 0, this.activeTetromino)) {
+            this.undrawSide(Arena);
+            this.x++;
+            this.drawSide2(Arena);
         }
     }
 
@@ -131,6 +145,17 @@ class Tetris {
         current = p;
         current.drawSide(panel);
 
+    }
+
+    FastDownTest() {
+
+        this.undrawSide(Arena);
+        while (!this.collision(0, 1, this.activeTetromino)) {
+            this.y++;
+        }
+        this.drawSide2(Arena);
+        this.lock();
+        newPiece = randomPiece();
     }
 
     collision(x, y, piece) {
@@ -178,6 +203,27 @@ class Tetris {
             this.direction = (this.direction + 1) % this.tetromino.length;
             this.activeTetromino = temp;
             this.draw();
+        }
+
+    }
+
+    rotateTest() {
+        console.log("p rotated2");
+        var temp = this.tetromino[(this.direction + 1) % this.tetromino.length];
+        var offset = 0;
+        if (this.collision(0, 0, temp)) {
+            if (this.x > COLS / 2) {
+                offset = -1;
+            } else {
+                offset = 1;
+            }
+        }
+        if (!this.collision(offset, 0, temp)) {
+            this.undrawSide(Arena);
+            this.x += offset;
+            this.direction = (this.direction + 1) % this.tetromino.length;
+            this.activeTetromino = temp;
+            this.drawSide2(Arena);
         }
 
     }

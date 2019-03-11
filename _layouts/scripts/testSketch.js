@@ -6,11 +6,14 @@ function preload() {
 }
 
 function setup() {
-    createCanvas(800, 300);
+    createCanvas(1000, 300);
+    colorMode(HSB, 255);
     // draw dots where there is text
 
-    var points = font.textToPoints('Happy', 100, 200, 128);
+    var points = font.textToPoints('Happy Birthday', 100, 200, 128);
     console.log(points);
+
+    
 
     for (var i = 0; i < points.length; i ++) {
         var pt = points[i];
