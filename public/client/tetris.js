@@ -3,6 +3,7 @@ const canvas = document.getElementById('tetris');
 const sidebar = document.getElementById('side');
 const save = document.getElementById('saved');
 const scoreElement = document.getElementById('score');
+const score2Element = document.getElementById('score2');
 // const timeElement = document.getElementById('time');
 
 const newPlayer = document.getElementById('tetris2');
@@ -21,6 +22,7 @@ const VACANT = '#dcdde1';
 
 var KO = false;
 var score = 0;
+var scorep2 = 0;
 var time = 0;
 var newPiece = null;
 var multiplayer = false; 
@@ -239,16 +241,14 @@ function CONTROL(event) {
         dropStart = Date.now();
     }
     else if (event.keyCode == KeyPressed.space) {
-        
+        const prev = p;
+        p.FastDown();
         sessionId = getSessionId();
         var moveData = {
-            piece: p,
+            piece: prev,
             sessionId: sessionId
         }
         socket.emit("moveFastDown", moveData);
-
-        p.FastDown();
-        
         
     }
     else if (event.keyCode == KeyPressed.shift) {
@@ -271,31 +271,37 @@ function update( time = 0 ) {
     var delta = now - dropStart;
 
     if( delta > dropInterval ){ 
-        
+        socket.on('Winner'), function(data) {
+            if (p.id == "loser") { alert("You Lost"); } 
+            else { alert(data.message); }
+        }
+
         socket.on('Rotate', function (data) {
-            console.log("in GAME, ROTATE recieved: ", data);
+            // console.log("in GAME, ROTATE recieved: ", data);
             
             newPiece.undrawSide(Arena);            
             newPiece = new Tetris(data.piece.tetromino, data.piece.color, data.piece.id);
             newPiece.x = data.piece.x;
             newPiece.y = data.piece.y;
             newPiece.direction = data.piece.direction;
-            newPiece.activeTetromino = data.piece.activeTetromino;     
+            newPiece.activeTetromino = data.piece.activeTetromino;    
+            
             newPiece.drawSide2(Arena);
+            
         });
         socket.on('Left', function (data) {
-            console.log("in GAME, LEFT recieved: ", data);
+            // console.log("in GAME, LEFT recieved: ", data);
             newPiece = new Tetris(data.piece.tetromino, data.piece.color, data.piece.id);
             // newPiece = data.piece;
             newPiece.x = data.piece.x + 1;
             newPiece.y = data.piece.y;
             newPiece.direction = data.piece.direction;
             newPiece.activeTetromino = data.piece.activeTetromino;
-            // serverDraw(newPiece);
+            
             newPiece.moveLeftTest();
         });
         socket.on('Right', function (data) {
-            console.log("in GAME, recieved: ", data);
+            // console.log("in GAME, recieved: ", data);
             newPiece = new Tetris(data.piece.tetromino, data.piece.color, data.piece.id);
             newPiece.x = data.piece.x - 1;
             newPiece.y = data.piece.y;
@@ -305,21 +311,24 @@ function update( time = 0 ) {
             newPiece.moveRightTest();
         });
         socket.on('FastDown', function (data) {
-            console.log("in GAME, recieved: ", data);
-            newPiece = new Tetris(data.piece.tetromino, data.piece.color, data.piece.id);
-            newPiece = data.piece;
+            // console.log("in GAME, recieved: ", data);
+            newPiece.undrawSide(Arena);   
+            newPiece = new Tetris(data.piece.tetromino, data.piece.color, data.piece.id);    
             newPiece.x = data.piece.x;
             newPiece.y = data.piece.y;
+            newPiece.direction = data.piece.direction;
+            newPiece.activeTetromino = data.piece.activeTetromino;
+            
             newPiece.FastDownTest();
         });
         socket.on('Down', function (data) {
-            console.log("in GAME, recieved: ", data);
+            // console.log("in GAME, recieved: ", data);
             newPiece = new Tetris(data.piece.tetromino, data.piece.color, data.piece.id);
-            // newPiece = data.piece;
             newPiece.x = data.piece.x;
             newPiece.y = data.piece.y - 1;
             newPiece.direction = data.piece.direction;
             newPiece.activeTetromino = data.piece.activeTetromino;
+            
             newPiece.moveDownTest();
         });
         
@@ -330,17 +339,41 @@ function update( time = 0 ) {
         var moveData = {
             piece: p,
             sessionId: sessionId,
-            board: Board
+            board: Board,
         }
         socket.emit("moveDown", moveData);
 
-        score += 100;
+        
+        score += 100; 
+        var scores = {
+            sessionId: sessionId,
+            score: score
+        }
+        socket.emit("scores", scores); 
+
         scoreElement.innerHTML = score;
+        if (newPiece != null ) {
+            socket.on('dispScores', function(data) {          
+                scorep2 = data.score;
+            })   
+        }
+        score2Element.innerHTML = scorep2;
         dropStart = Date.now();
 
     } if (!gameOver) {
         requestAnimationFrame(update);
     } 
     
+}
+if (gameOver) {
+    sessionId = getSessionId();
+    p.id = "loser";
+    var loser = {
+        sessionId: sessionId,
+        loserId: "loser"
+    }
+    socket.emit("gameOver", loser);
+    update();
+    // break;
 }
 update();

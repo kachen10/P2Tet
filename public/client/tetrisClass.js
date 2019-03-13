@@ -11,6 +11,7 @@ class Tetris {
 
         this.x = 3;
         this.y = -1;
+        this.end = false;
     }
 
     fill(color) {
@@ -79,7 +80,7 @@ class Tetris {
             this.y++;
             this.draw();
         } else {
-            this.lock(Board);
+            this.lock(Board, 1);
             p = randomPiece();
             current = p;
             current.drawSide(panel);
@@ -94,7 +95,7 @@ class Tetris {
             this.y++;
             this.drawSide2(Arena);
         } else {
-            this.lock(PLAYER.newBoard);
+            this.lock(PLAYER.newBoard, 2);
             newPiece = randomPiece();
 
         }
@@ -140,7 +141,7 @@ class Tetris {
             this.y++;
         }
         this.draw();
-        this.lock(Board);
+        this.lock(Board, 1);
         p = randomPiece();
         current = p;
         current.drawSide(panel);
@@ -154,7 +155,7 @@ class Tetris {
             this.y++;
         }
         this.drawSide2(Arena);
-        this.lock(PLAYER.newBoard);
+        this.lock(PLAYER.newBoard, 2);
         newPiece = randomPiece();
     }
 
@@ -228,7 +229,7 @@ class Tetris {
 
     }
 
-    lock(BOARD) {
+    lock(BOARD, id) {
 
         for (var r = 0; r < this.activeTetromino.length; r++) {
             for (var c = 0; c < this.activeTetromino.length; c++) {
@@ -265,7 +266,9 @@ class Tetris {
                 for (var c = 0; c < COLS; c++) {
                     BOARD.board[0][c] = VACANT;
                 }
+
                 score += 100;
+                
             }
         }
         // update the board
@@ -273,6 +276,8 @@ class Tetris {
         drawSideBar(panel);
 
         scoreElement.innerHTML = score;
+        score2Element.innerHTML = scorep2;
+        
     }
 
     pieceSaved() {

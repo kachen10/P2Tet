@@ -151,7 +151,23 @@ io.sockets.on('connection',
                 console.log("Data emitted");
             });
 
+        socket.on('scores', 
+            function(data) {
+                console.log("data scores: ", data.score);
+                socket.to(data.sessionId).emit('dispScores', data.score);
+            });
+        socket.on('gameOver',
 
+            function (data) {
+                console.log("We have a loser");
+                // console.log("sessionId =", data.sessionId);
+                var send = {
+                    message: "You Won!",
+                    id: data.loserId
+                }
+                socket.to(data.sessionId).emit('Winner', send);
+                console.log("Data emitted");
+            });
 
 
 
