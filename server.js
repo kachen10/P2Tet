@@ -16,7 +16,6 @@ app.use(express.static('public/client/'));
 
 var io = require('socket.io')(server);
 
-var newPlayeriD;
 var players = [];
 
 var clients = 0;
@@ -113,7 +112,7 @@ io.sockets.on('connection',
                     piece: data.piece
                 }
                 socket.to(data.sessionId).emit('Left', send);
-                console.log("Data emitted");
+                console.log("Data moveLeft emitted");
             });
         socket.on('moveRight',
 

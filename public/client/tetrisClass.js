@@ -74,12 +74,12 @@ class Tetris {
 
     moveDown() {
 
-        if (!this.collision(0, 1, this.activeTetromino)) {
+        if (!this.collision(Board, 0, 1, this.activeTetromino)) {
             this.unDraw();
             this.y++;
             this.draw();
         } else {
-            this.lock();
+            this.lock(Board);
             p = randomPiece();
             current = p;
             current.drawSide(panel);
@@ -89,12 +89,12 @@ class Tetris {
 
     moveDownTest() {
 
-        if (!this.collision(0, 1, this.activeTetromino)) {
+        if (!this.collision(PLAYER.newBoard, 0, 1, this.activeTetromino)) {
             this.undrawSide(Arena);
             this.y++;
             this.drawSide2(Arena);
         } else {
-            this.lock();
+            this.lock(PLAYER.newBoard);
             newPiece = randomPiece();
 
         }
@@ -103,14 +103,14 @@ class Tetris {
 
 
     moveLeft() {
-        if (!this.collision(-1, 0, this.activeTetromino)) {
+        if (!this.collision(Board, -1, 0, this.activeTetromino)) {
             this.unDraw();
             this.x--;
             this.draw();
         }
     }
     moveLeftTest() {
-        if (!this.collision(-1, 0, this.activeTetromino)) {
+        if (!this.collision(PLAYER.newBoard, -1, 0, this.activeTetromino)) {
             this.undrawSide(Arena);
             this.x--;
             this.drawSide2(Arena);
@@ -118,14 +118,14 @@ class Tetris {
     }
 
     moveRight() {
-        if (!this.collision(1, 0, this.activeTetromino)) {
+        if (!this.collision(Board, 1, 0, this.activeTetromino)) {
             this.unDraw();
             this.x++;
             this.draw();
         }
     }
     moveRightTest() {
-        if (!this.collision(1, 0, this.activeTetromino)) {
+        if (!this.collision(PLAYER.newBoard, 1, 0, this.activeTetromino)) {
             this.undrawSide(Arena);
             this.x++;
             this.drawSide2(Arena);
@@ -136,11 +136,11 @@ class Tetris {
     FastDown() {
 
         this.unDraw();
-        while (!this.collision(0, 1, this.activeTetromino)) {
+        while (!this.collision(Board, 0, 1, this.activeTetromino)) {
             this.y++;
         }
         this.draw();
-        this.lock();
+        this.lock(Board);
         p = randomPiece();
         current = p;
         current.drawSide(panel);
@@ -150,15 +150,15 @@ class Tetris {
     FastDownTest() {
 
         this.undrawSide(Arena);
-        while (!this.collision(0, 1, this.activeTetromino)) {
+        while (!this.collision(PLAYER.newBoard, 0, 1, this.activeTetromino)) {
             this.y++;
         }
         this.drawSide2(Arena);
-        this.lock();
+        this.lock(PLAYER.newBoard);
         newPiece = randomPiece();
     }
 
-    collision(x, y, piece) {
+    collision(BOARD, x, y, piece) {
         for (var r = 0; r < piece.length; r++) {
             for (var c = 0; c < piece.length; c++) {
                 // if the square is empty, we skip it
@@ -178,7 +178,7 @@ class Tetris {
                     continue;
                 }
                 // check if there is a locked piece alrady in place
-                if (Board.board[newY][newX] != VACANT) {
+                if (BOARD.board[newY][newX] != VACANT) {
                     return true;
                 }
             }
@@ -190,14 +190,14 @@ class Tetris {
         console.log("p rotated2");
         var temp = this.tetromino[(this.direction + 1) % this.tetromino.length];
         var offset = 0;
-        if (this.collision(0, 0, temp)) {
+        if (this.collision(Board, 0, 0, temp)) {
             if (this.x > COLS / 2) {
                 offset = -1;
             } else {
                 offset = 1;
             }
         }
-        if (!this.collision(offset, 0, temp)) {
+        if (!this.collision(Board, offset, 0, temp)) {
             this.unDraw();
             this.x += offset;
             this.direction = (this.direction + 1) % this.tetromino.length;
@@ -211,14 +211,14 @@ class Tetris {
         console.log("p rotated2");
         var temp = this.tetromino[(this.direction + 1) % this.tetromino.length];
         var offset = 0;
-        if (this.collision(0, 0, temp)) {
+        if (this.collision(PLAYER.newBoard, 0, 0, temp)) {
             if (this.x > COLS / 2) {
                 offset = -1;
             } else {
                 offset = 1;
             }
         }
-        if (!this.collision(offset, 0, temp)) {
+        if (!this.collision(PLAYER.newBoard, offset, 0, temp)) {
             this.undrawSide(Arena);
             this.x += offset;
             this.direction = (this.direction + 1) % this.tetromino.length;
@@ -228,7 +228,7 @@ class Tetris {
 
     }
 
-    lock() {
+    lock(BOARD) {
 
         for (var r = 0; r < this.activeTetromino.length; r++) {
             for (var c = 0; c < this.activeTetromino.length; c++) {
@@ -244,26 +244,26 @@ class Tetris {
                     break;
                 }
 
-                Board.board[this.y + r][this.x + c] = this.color;
+                BOARD.board[this.y + r][this.x + c] = this.color;
             }
         }
         // remove full rows
         for (var r = 0; r < ROWS; r++) {
             let isRowFull = true;
             for (var c = 0; c < COLS; c++) {
-                isRowFull = isRowFull && (Board.board[r][c] != VACANT);
+                isRowFull = isRowFull && (BOARD.board[r][c] != VACANT);
             }
             if (isRowFull) {
                 // if the row is full
                 // we move down all the rows above it
                 for (var y = r; y > 1; y--) {
                     for (c = 0; c < COLS; c++) {
-                        Board.board[y][c] = Board.board[y - 1][c];
+                        BOARD.board[y][c] = BOARD.board[y - 1][c];
                     }
                 }
                 // the top row board[0][..] has no row above it
                 for (var c = 0; c < COLS; c++) {
-                    Board.board[0][c] = VACANT;
+                    BOARD.board[0][c] = VACANT;
                 }
                 score += 100;
             }
