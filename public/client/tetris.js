@@ -62,8 +62,8 @@ function getSessionId() {
     return id;
 }
 
-var address = 'http://localhost:5000';
-// var address = 'http://ptetris.herokuapp.com';
+// var address = 'http://localhost:5000';
+var address = 'http://ptetris.herokuapp.com';
 var sessionId = null;
 // var socket = io.connect('http://ptetris.herokuapp.com');
 if (window.location.hash) {
@@ -86,8 +86,6 @@ socket.emit("start", client_data);
 
 
 var Board = new board();
-var player = new TetrisManager(document);
-
 
 
 var currentPiece = [];
@@ -167,6 +165,8 @@ if (multiplayer == true) {
 
 var PLAYER = new TetrisManager(document);
 PLAYER.newBoard = new board();
+
+
 drawBoardTemp(Arena, PLAYER.newBoard);   
 drawSideBar(panel);
 drawSideBar(stack);
@@ -254,6 +254,12 @@ function CONTROL(event) {
     }
     else if (event.keyCode == KeyPressed.shift) {
         p.pieceSaved();
+        sessionId = getSessionId();
+        var moveData = {
+            piece: p,
+            sessionId: sessionId
+        }
+        socket.emit("pieceSaved", moveData);
     }
 
 }
@@ -276,6 +282,9 @@ function update( time = 0 ) {
             console.log("Loser recieved");
             if (p.id == "loser") { alert("You Lost"); } 
             else { alert(data.message); }
+        });
+        socket.on('saved', function (data) {
+            newPiece.undrawSide(Arena);  
         });
 
         socket.on('Rotate', function (data) {

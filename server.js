@@ -95,7 +95,7 @@ io.sockets.on('connection',
                 console.log("Data received in moveDown");
                 // console.log("sessionId =", data.sessionId);
                 var send = {
-                    message: "let's play a game (too)",
+                    
                     piece: data.piece
                 }
                 socket.to(data.sessionId).emit('Down', send);
@@ -108,7 +108,6 @@ io.sockets.on('connection',
                 console.log("Data received in moveLeft");
                 // console.log("sessionId =", data.sessionId);
                 var send = {
-                    message: "let's play a game (too)",
                     piece: data.piece
                 }
                 socket.to(data.sessionId).emit('Left', send);
@@ -120,7 +119,7 @@ io.sockets.on('connection',
                 console.log("Data received in moveRight");
                 // console.log("sessionId =", data.sessionId);
                 var send = {
-                    message: "let's play a game (too)",
+                    
                     piece: data.piece
                 }
                 socket.to(data.sessionId).emit('Right', send);
@@ -132,7 +131,7 @@ io.sockets.on('connection',
                 console.log("Data received in moveFastDown");
                 // console.log("sessionId =", data.sessionId);
                 var send = {
-                    message: "let's play a game (too)",
+                   
                     piece: data.piece
                 }
                 socket.to(data.sessionId).emit('FastDown', send);
@@ -144,13 +143,23 @@ io.sockets.on('connection',
                 console.log("Data received in move");
                 // console.log("sessionId =", data.sessionId);
                 var send = {
-                    message: "let's play a game (too)",
+                    
                     piece: data.piece
                 }
                 socket.to(data.sessionId).emit('Rotate', send);
                 console.log("Data emitted");
             });
+        socket.on('pieceSaved',
 
+            function (data) {
+                console.log("Data received in pieceSaved");
+                // console.log("sessionId =", data.sessionId);
+                var send = {
+                    piece: data.piece
+                }
+                socket.to(data.sessionId).emit('saved', send);
+                console.log("Data emitted");
+            });
         socket.on('scores', 
             function(data) {
                 console.log("data scores: ", data.score);

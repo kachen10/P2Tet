@@ -81,6 +81,7 @@ class Tetris {
             this.draw();
         } else {
             this.lock(Board, 1);
+
             p = randomPiece();
             current = p;
             current.drawSide(panel);
@@ -97,6 +98,7 @@ class Tetris {
         } else {
             this.lock(PLAYER.newBoard, 2);
             newPiece = randomPiece();
+            drawBoardTemp(Arena, PLAYER.newBoard);
 
         }
     }
@@ -142,6 +144,7 @@ class Tetris {
         }
         this.draw();
         this.lock(Board, 1);
+       
         p = randomPiece();
         current = p;
         current.drawSide(panel);
@@ -156,7 +159,9 @@ class Tetris {
         }
         this.drawSide2(Arena);
         this.lock(PLAYER.newBoard, 2);
-        newPiece = randomPiece();
+        drawBoardTemp(Arena, PLAYER.newBoard);
+        
+        // newPiece = randomPiece();
     }
 
     collision(BOARD, x, y, piece) {
@@ -273,9 +278,13 @@ class Tetris {
             }
         }
         // update the board
-        drawBoard(Board);
-        drawSideBar(panel);
-
+        if (id == 1) {
+            drawBoard(Board);
+            drawSideBar(panel);
+        }
+       
+        // drawBoardTemp(Arena, PLAYER.newBoard);
+          
         scoreElement.innerHTML = score;
         score2Element.innerHTML = scorep2;
         
