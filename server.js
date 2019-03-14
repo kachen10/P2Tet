@@ -157,7 +157,6 @@ io.sockets.on('connection',
                 socket.to(data.sessionId).emit('dispScores', data.score);
             });
         socket.on('gameOver',
-
             function (data) {
                 console.log("We have a loser");
                 // console.log("sessionId =", data.sessionId);
@@ -168,9 +167,6 @@ io.sockets.on('connection',
                 socket.to(data.sessionId).emit('Winner', send);
                 console.log("Data emitted");
             });
-
-
-
 
         socket.on('disconnect', function () {
             console.log("Client has disconnected");

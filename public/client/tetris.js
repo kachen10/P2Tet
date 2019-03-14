@@ -21,6 +21,7 @@ const VACANT = '#dcdde1';
 
 
 var KO = false;
+var gameOver = false;
 var score = 0;
 var scorep2 = 0;
 var time = 0;
@@ -61,8 +62,8 @@ function getSessionId() {
     return id;
 }
 
-// var address = 'http://localhost:5000';
-var address = 'http://ptetris.herokuapp.com';
+var address = 'http://localhost:5000';
+// var address = 'http://ptetris.herokuapp.com';
 var sessionId = null;
 // var socket = io.connect('http://ptetris.herokuapp.com');
 if (window.location.hash) {
@@ -262,8 +263,7 @@ let dropStart = Date.now();
 
 let dropInterval = 1000;
 let lastTime = 0;
-let gameOver = false;
-
+var endGame = false;
 
 function update( time = 0 ) {  
 
@@ -271,10 +271,12 @@ function update( time = 0 ) {
     var delta = now - dropStart;
 
     if( delta > dropInterval ){ 
-        socket.on('Winner'), function(data) {
+
+        socket.on('Winner', function(data) {
+            console.log("Loser recieved");
             if (p.id == "loser") { alert("You Lost"); } 
             else { alert(data.message); }
-        }
+        });
 
         socket.on('Rotate', function (data) {
             // console.log("in GAME, ROTATE recieved: ", data);
@@ -360,20 +362,29 @@ function update( time = 0 ) {
         score2Element.innerHTML = scorep2;
         dropStart = Date.now();
 
-    } if (!gameOver) {
+    } 
+    if (!gameOver) {
         requestAnimationFrame(update);
     } 
+    else if (gameOver && endGame == false) {
+        endGame = true;
+        sessionId = getSessionId();
+        p.id = "loser";
+        console.log("p.id: ", p.id);
+        var loserID = {
+            sessionId: sessionId,
+            loserId: "loser"
+        }
+        socket.emit("gameOver", loserID); 
+        console.log("Loser emitted");
+        update();
+        
+        // break;
+    }
+    
     
 }
-if (gameOver) {
-    sessionId = getSessionId();
-    p.id = "loser";
-    var loser = {
-        sessionId: sessionId,
-        loserId: "loser"
-    }
-    socket.emit("gameOver", loser);
-    update();
-    // break;
-}
 update();
+
+
+// update();

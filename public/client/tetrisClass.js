@@ -242,6 +242,7 @@ class Tetris {
                     alert("Game Over");
                     // stop request animation frame
                     gameOver = true;
+                    
                     break;
                 }
 
