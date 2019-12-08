@@ -1,12 +1,22 @@
 # Dependency directories
-node_modules/
+**/node_modules/*
 jspm_packages/
+
+# Firebase
+firebase-debug.log
+**/.firebaserc
+.runtimeconfig.json
+.firebase/
 
 # Optional npm cache directory
 .npm
+.npmrc
+yarn.lock
+npm-debug.log
 
 # IDE
 .idea
+.DS_Store
 
 # Optional eslint cache
 .eslintcache

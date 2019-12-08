@@ -1,25 +1,28 @@
 
 body {
-  background-color: #b2bec3;
-} 
-.container{
+    background-color: #b2bec3;
+}
 
+.container {
     margin-top: 60px;
     display: flex;
     flex-direction: row;
     justify-content: center;
-    align-items: space-between;
+    align-content: space-between;
 }
+
 .game {
     order: 1;
 }
+
 .sidebar {
     order: 2;
-    width: 120px;  /* Or whatever */
+    width: 120px; /* Or whatever */
     height: 400px; /* Or whatever */
     margin-left: 30px;
-    
+
 }
+
 #saved {
     margin-top: 30px;
 }
