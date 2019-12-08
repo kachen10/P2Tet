@@ -1,25 +1,24 @@
-var express = require('express');
+const express = require('express');
 const Session = require('./public/server/session');
-var app = express();
-var server = app.listen(process.env.PORT || 5000, listen);
+const app = express();
+const server = app.listen(process.env.PORT || 5000, listen);
 console.log("server.address()", server.address());
 const sessions = new Map;
 
 // This call back just tells us that the server has started
 function listen() {
-  var host = server.address().address;
-  var port = server.address().port;
+  const host = server.address().address;
+  const port = server.address().port;
   console.log('Example app listening at http://' + host + ':' + port);
 }
 
-app.use(express.static('public/client/'));
+app.use(express.static('public/'));
 
-var io = require('socket.io')(server);
+const io = require('socket.io')(server);
 
-var players = [];
+const players = [];
 
-var clients = 0;
-
+let clients = 0;
 
 function createSession(id) {
   if (sessions.has(id)) {
@@ -37,7 +36,6 @@ function createSession(id) {
 function getSession(id) {
   return sessions.get(id);
 }
-
 
 function Player(id, tetris) {
   this.tetromino = tetris.tetromino;
@@ -77,7 +75,7 @@ io.sockets.on('connection',
           const session = getSession(sessionId);
           console.log("JoinedSession", session);
           session.join(player);
-          socket.join(sessionId)
+          socket.join(sessionId);
           console.log("Player Joined");
           console.log("List of Players: ", session.clients);
           if (clients === 2) {
@@ -89,7 +87,6 @@ io.sockets.on('connection',
     );
 
     socket.on('moveDown',
-
       function (data) {
         console.log("Data received in moveDown");
         // console.log("sessionId =", data.sessionId);
@@ -136,7 +133,6 @@ io.sockets.on('connection',
         console.log("Data emitted");
       });
     socket.on('moveRotate',
-
       function (data) {
         console.log("Data received in move");
         // console.log("sessionId =", data.sessionId);
