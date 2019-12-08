@@ -1,50 +1,24 @@
+<!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <script src="https://cdn.socket.io/socket.io-1.4.5.js" type="text/javascript"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.1/p5.js" type="text/javascript"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.1/addons/p5.dom.js" type="text/javascript"></script>
-    <script src="client/rainEffect.js" type="text/javascript"></script>
-    <link href="client/gameStyle.css" rel="stylesheet" type="text/css">
+    <!-- Compiled and minified CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
 
+    <!--Let browser know website is optimized for mobile-->
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+    <title>P2Tetris</title>
 </head>
 
 <body>
+<button class="btn waves-effect waves-light" onclick="window.location.href = '/singleplayer/index.html';"
+        type="button">
+    Single Player
+</button>
 
-<div class="container">
-    <div class="game">
-        <canvas height="400" id="tetris" width="200"></canvas>
-        <div>
-            Score :
-            <div id="score">0</div>
-        </div>
-
-    </div>
-    <div class="sidebar">
-        <canvas height="120" id="side" width="120"></canvas>
-        <canvas height="120" id="saved" width="120"></canvas>
-    </div>
-    <div class="P2">
-        <canvas height="400" id="tetris2" width="200"></canvas>
-        <div>
-            Score :
-            <div id="score2">0</div>
-        </div>
-
-    </div>
-    <div class="sidebar2">
-        <canvas height="120" id="side2" width="120"></canvas>
-        <canvas height="120" id="saved2" width="120"></canvas>
-    </div>
-</div>
-
-<script src="client/board.js"></script>
-<script src="../server.js"></script>
-<script src="client/tetrominoes.js"></script>
-<script src="client/tetrisClass.js"></script>
-<script src="client/tetrisManager.js"></script>
-<script src="client/tetris.js"></script>
-<script src="/node_modules/socket.io/lib/socket.js"></script>
-
+<button class="btn waves-effect waves-light" onclick="window.location.href = '/multiplayer/index.html';"
+        type="button">
+    Multiplayer
+</button>
 </body>
+
 </html>
